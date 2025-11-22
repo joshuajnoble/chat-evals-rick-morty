@@ -1,0 +1,4 @@
+
+This applications shows loading data from the GraphQL interface to the Rick and Morty API and then using the OpenAI Agents SDK to read/write data from those JSON files and interface with the user.
+
+It also uses the DeepEval library (https://deepeval.com) to run evaluations on the correctness of the response and the task completion and tool calls used in generating the response. Users can trigger an evaluation simply by typing in "Run Evaluation" and then selecting the "Run offline DeepEval" button that the system generates in response. The evaluations use a TaskCompletionMetric and G-Eval (https://arxiv.org/abs/2303.16634). Both of these uses LLM-as-a-judge with chain-of-thoughts to evaluate the generated responses.
