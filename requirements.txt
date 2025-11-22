@@ -1,0 +1,4 @@
+requests
+chainlit
+openai-agents
+asyncio
