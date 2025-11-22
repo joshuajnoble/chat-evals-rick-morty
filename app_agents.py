@@ -3,10 +3,6 @@ import json
 import base64
 
 from agents import Agent, WebSearchTool, Runner, function_tool
-
-from traceloop.sdk import Traceloop
-from traceloop.sdk.decorators import workflow
-
 from deepeval.tracing import observe
 
 import chainlit as cl # pyright: ignore[reportMissingImports]
