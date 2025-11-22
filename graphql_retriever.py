@@ -1,13 +1,9 @@
-import argparse
 import json
-import sys
-from typing import Any, Dict, Optional
+from typing import Any, Dict
 
 import requests
 
 ENDPOINT = "https://rickandmortyapi.com/graphql"
-
-
 
 def testing_query():
     query = """
@@ -41,7 +37,7 @@ def testing_query():
 
 
 def query_graphql(query: str, filter: str = "") -> Dict[str, Any]:
-    #Send a GraphQL query to the Rick & Morty API and return the parsed JSON response.
+    """Send a GraphQL query to the Rick & Morty API and return the parsed JSON response."""
 
     payload = {"query": query}
     if filter == "":
@@ -108,13 +104,13 @@ query($filter: FilterLocation) {
 """
 
 def fetch(query: str, page: int = 1, filter : str = "") -> Dict[str, Any]:
-    
+    """ just get the results from the API """
     results = query_graphql(query, filter=filter)
     return results
 
 
 def fetch_and_save(query: str, page: int = 1, filter : str = "") -> bool:
-    
+    """ get the results from the API and save locally to json """
     results = query_graphql(query, filter=filter)
 
     fnames = {LOCATIONS:"locations", CHARACTERS:"characters", EPISODES:"episodes"}
