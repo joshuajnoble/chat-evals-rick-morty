@@ -18,6 +18,7 @@ from deepeval.test_case import LLMTestCase, ToolCall
 
 from deepeval.metrics import GEval
 from deepeval.test_case import LLMTestCaseParams
+from deepeval.metrics import ToolCorrectnessMetric
 
 @function_tool
 def write_to_storage(type: str, entity: str, details: str) -> None:
@@ -119,18 +120,14 @@ async def on_action(action):
     # Initialize task metric
     task_completion = TaskCompletionMetric(threshold=0.5, model="gpt-4o")
 
+    # Initialize task metric
+    tool_correctness = ToolCorrectnessMetric()
+
     eval_results = ""
 
     # Loop through dataset
     for golden in goldens:
         response = await Runner.run(chat_agent, golden.input)
-        test_case = LLMTestCase(
-            input=golden.input, expected_output=golden.expected_output, actual_output=response.final_output
-        )
-
-        correctness_metric.measure(test_case)
-
-        eval_results = eval_results + f" Correctness score: {correctness_metric.score} \n reason: {correctness_metric.reason} \n"
 
         # get all of the tools that were called
         tools_called = []
@@ -143,7 +140,8 @@ async def on_action(action):
                     if(o.name == "read_from_storage"):
                         tools_called.append(read_tool)
 
-        task_case = LLMTestCase(
+        # create the test case
+        test_case = LLMTestCase(
             input=golden.input, 
             expected_output=golden.expected_output, 
             actual_output=response.final_output, 
@@ -151,10 +149,19 @@ async def on_action(action):
             tools_called=tools_called
         )
 
-        task_completion.measure(task_case)
-        print(task_completion.score, task_completion.reason)
+        correctness_metric.measure(test_case)
+
+        eval_results = eval_results + f" Correctness score: {correctness_metric.score} \n reason: {correctness_metric.reason} \n"
+
+        task_completion.measure(test_case)
 
         eval_results = eval_results + f" Task score: {task_completion.score} \n reason: {task_completion.reason} \n"
+
+        tool_correctness.measure(test_case)
+        print(tool_correctness.score, tool_correctness.reason)
+
+        eval_results = eval_results + f" Tool usage score: {tool_correctness.score} \n reason: {tool_correctness.reason} \n"
+
 
     eval_reponse = cl.Message(author="assistant", content=eval_results)
     await eval_reponse.send()
